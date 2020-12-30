@@ -11,11 +11,20 @@
 
 require 'vendor/autoload.php';
 use League\Csv\Reader;
+use Cocur\Slugify\Slugify;
 
+/**
+ * Return an array of files matching specific types in this directory
+ */
 function get_files() {
 	return glob( "*.{png,jpg,mp4,webp,gif}", GLOB_BRACE );
 }
 
+/**
+ * Return the contents of the CSV as parsed by leavue/CSV
+ *
+ * @link https://csv.thephpleague.com/9.0/reader/
+ */
 function get_csv() {
 	$csv = Reader::createFromPath( './sources.csv', 'r' );
 	$csv->setHeaderOffset(0);
@@ -45,10 +54,102 @@ function merge_list( $csv, $files ) {
 	return $merged;
 }
 
+/**
+ * Convert number of bytes to human-readable units
+ *
+ * Derives from Jeffrey Sambells' function, which used
+ * power-of-ten abbreviations for power-of-two counts.
+ * This fixes that by counting bytes by power-of-ten,
+ * and returns strings with power-of-ten abbreviations.
+ *
+ * @link https://web.archive.org/web/20191219095113/http://jeffreysambells.com/2012/10/25/human-readable-filesize-php
+ * @param int $bytes    Bytes in the file
+ * @param int $decimals Decimals of precision
+ * @return String
+ */
+function human_filesize($bytes, $decimals = 2) {
+	$size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+	$factor = floor((strlen($bytes) - 1) / 3);
+	return sprintf("%.{$decimals}f", $bytes / pow(1000, $factor)) . @$size[$factor];
+}
+
+/**
+ * Create the table of things
+ */
 function render_table() {
 	$csv = get_csv();
 	$files = get_files();
 	$merged = merge_list( $csv, $files );
+	$headers = $csv->getHeader();
+	$slugify = new Slugify();
+
+	echo '<table>';
+		echo '<thead>';
+			echo '<tr>';
+				foreach ( $headers as $header ) {
+					printf(
+						'<th scope="col" class="%1$s">%2$s</th>',
+						$slugify->slugify( $header ),
+						htmlspecialchars( $header )
+					);
+				}
+				echo '<th scope="col">filesize</th>';
+			echo '</tr>';
+		echo '</thead>';
+		echo '<tbody>';
+			foreach ( $merged as $filename => $data ) {
+				echo '<tr>';
+
+					foreach ( $headers as $header ) {
+						switch ($header) {
+							case 'filename':
+								printf(
+									'<th scope="row" class="filename"><a href="%1$s">%2$s</a></th>',
+									rawurlencode( $filename ),
+									htmlspecialchars( $filename )
+								);
+								break;
+							case 'description':
+								$description = $data[ $header ] ? htmlspecialchars( $data[ $header ] ) : '&#9888;&#xfe0f; This file is not described in sources.csv';
+								printf(
+									'<td class="%1$s">%2$s</td>',
+									$slugify->slugify( $header ),
+									$description
+								);
+								break;
+							case 'source_url':
+								if ( ! empty( $data[ $header ] ) ) {
+									printf(
+										'<td class="%1$s"><a href="%2$s">%3$s</a></td>',
+										$slugify->slugify( $header ),
+										$data[ $header ],
+										'&#128279;&#xFE0E;', // variation selector 15 to force non-emoji
+									);
+								} else {
+									printf(
+										'<td class="%1$s"></td>',
+										$slugify->slugify( $header )
+									);
+								}
+								break;
+							default:
+								printf(
+									'<td class="%1$s">%2$s</td>',
+									$slugify->slugify( $header ),
+									htmlspecialchars( $data[ $header ] )
+								);
+								break;
+						}
+					}
+					printf(
+						'<td class="filesize">%1$s</td>',
+						htmlspecialchars( human_filesize( filesize( $filename ), 0 ) )
+					);
+
+				echo '</tr>';
+			}
+		echo '</tbody>';
+	echo '</table>';
 }
 
 ?>
@@ -56,15 +157,38 @@ function render_table() {
 <html>
 	<head>
 		<title>Gifs page</title>
+		<style type="text/css">
+			* {
+				box-sizing: border-box;
+			}
+			table {
+				max-width: 100%;
+				overflow-x: scroll;
+			}
+			th, td {
+				vertical-align: top;
+			}
+			th {
+				text-align: left;
+			}
+			td,
+			tbody th {
+				font-weight: normal;
+			}
+			td.source-url {
+				max-width: 10ch;
+				overflow: hidden;
+				max-height: 1em;
+				font-family: "Symbola", "Segoe UI Symbol", sans-serif;
+			}
+		</style>
 	</head>
 	<body>
 		<h1>Gifs page</h1>
 
-		<pre><code>
 		<?php
 			render_table();
 		?>
-		</code></pre>
 
 		<footer>
 			<p>This page is <a href="https://github.com/benlk/gifs.benlk.com">powered by open-source software.</a></p>

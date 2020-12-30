@@ -1,0 +1,15 @@
+{
+    "name": "benlk/gifs.benlk.com",
+    "description": "A source for gifs.benlk.com",
+    "type": "project",
+    "require": {
+        "league/csv": "^9.6"
+    },
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Ben Keith",
+            "email": "ben@benlk.com"
+        }
+    ]
+}

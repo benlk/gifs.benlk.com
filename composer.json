@@ -3,7 +3,8 @@
     "description": "A source for gifs.benlk.com",
     "type": "project",
     "require": {
-        "league/csv": "^9.6"
+        "league/csv": "^9.6",
+        "cocur/slugify": "^4.0"
     },
     "license": "GPL-3.0",
     "authors": [

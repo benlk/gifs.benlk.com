@@ -1,0 +1,8 @@
+# image types
+*.gif
+*.jpg
+*.png
+*.webp
+*.mp4
+
+sources.csv

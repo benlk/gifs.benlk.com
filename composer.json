@@ -4,7 +4,8 @@
     "type": "project",
     "require": {
         "league/csv": "^9.6",
-        "cocur/slugify": "^4.0"
+        "cocur/slugify": "^4.0",
+        "ext-json": "^1.7"
     },
     "license": "GPL-3.0",
     "authors": [

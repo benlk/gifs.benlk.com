@@ -160,10 +160,25 @@ function render_table() {
 		<style type="text/css">
 			* {
 				box-sizing: border-box;
+				font-family: sans-serif;
+				font-size: 14px;
 			}
 			table {
 				max-width: 100%;
 				overflow-x: scroll;
+				border-collapse: collapse;
+			}
+			thead {
+				border: 2px solid black;
+				position: sticky;
+				top: 0;
+				background-color: white;
+			}
+			thead td {
+				border-bottom: 1px solid black;
+			}
+			tbody tr {
+				border-top: 1px solid #ddd;
 			}
 			th, td {
 				vertical-align: top;
@@ -174,6 +189,7 @@ function render_table() {
 			td,
 			tbody th {
 				font-weight: normal;
+				padding-bottom: 1.0em;
 			}
 			td.source-url {
 				max-width: 10ch;
@@ -191,7 +207,10 @@ function render_table() {
 		?>
 
 		<footer>
-			<p>This page is <a href="https://github.com/benlk/gifs.benlk.com">powered by open-source software.</a></p>
+			<p>
+				This page is <a href="https://github.com/benlk/gifs.benlk.com">powered by open-source software.</a>
+				<a href="./sources.csv">Download the gif list</a>.
+			</p>
 		</footer>
 	</body>
 </html>

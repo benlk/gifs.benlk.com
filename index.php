@@ -123,7 +123,7 @@ function render_table() {
 										'<td class="%1$s"><a href="%2$s">%3$s</a></td>',
 										$slugify->slugify( $header ),
 										$data[ $header ],
-										'&#128279;&#xFE0E;', // variation selector 15 to force non-emoji
+										'&#128279;&#xFE0E;' // variation selector 15 to force non-emoji
 									);
 								} else {
 									printf(
